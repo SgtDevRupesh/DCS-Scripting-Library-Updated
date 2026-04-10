@@ -350,6 +350,9 @@ do
                 ---|  "WingLoong-I"
                 ---|  "Yak-40"
                 ---|  "Yak-52"
+                ---|  "C-130J-30"
+                ---|  "F-14A-135-GR-Early"
+                ---|  "MiG-29 Fulcrum"
             end
 
             --Heli

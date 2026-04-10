@@ -493,7 +493,7 @@ do
             ---Updates the type line of the specified mark to be the new value.
             ---https://wiki.hoggitworld.com/view/DCS_func_setMarkupTypeLine
             ---@param id number
-            ---@param TypeLine number
+            ---@param TypeLine Enum_LineTypes
             function trigger.action.setMarkupTypeLine(id, TypeLine) end
 
             ---Sets the internal cargo for the specified unit at the specified mass. Overrides any previously set value. Can be used in conjunction with troop transport to simulate cargo being added to the aircraft. Can be used on any unit object, however it only will impact airplanes and helicopters. Mass is defined in kilograms.

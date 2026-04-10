@@ -510,16 +510,17 @@ do
         ---Searches the defined area passed to the function to remove craters, object wreckage, and any other debris within the search volume. Will not remove wreckage of scenery objects. See pages for the correct format of each volume type:
         ---https://wiki.hoggitworld.com/view/DCS_func_removeJunk
         ---@return number
-        ---@param searchVolume table
+        ---@param searchVolume world.searchObjects.search_volume
         function world.removeJunk( searchVolume ) end
 
         ---Searches a defined volume of 3d space for the specified objects within it and then can run function on each returned object. Object category is either a single enum or a table of enums that defines the types of objects that will be searched for Search volume is the defined 3d space that will be searched. Handler is the function that will be run on each object that is found. Any data is a variable that is passed to the handler function, it can be anything.
         ---https://wiki.hoggitworld.com/view/DCS_func_searchObjects
+        ---@generic ARG
         ---@return number
         ---@param ObjectCategory Object.Category|table<number, Object.Category>
-        ---@param searchVolume world.searchObjects.search_volume|table
-        ---@param Handler function ObjectSeatchHandler
-        ---@param data? any
+        ---@param searchVolume world.searchObjects.search_volume
+        ---@param Handler fun(Obj:Objects?, ARG:ARG) ObjectSearchHandler
+        ---@param data? ARG
         function world.searchObjects( ObjectCategory, searchVolume, Handler, data ) end
 
         ---Read persistence data identified by name. Returns Lua-value stored in this miz/sav by a given name or nil if no value found.
@@ -535,7 +536,7 @@ do
         function world.setPersistenceHandler( name, handler ) end
 
         ---No Docu
-        ---@param ... any unkown
+        ---@param ... any unknown
         function world.runPersistenceHandlers( ... ) end
     end
 end

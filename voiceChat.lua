@@ -89,11 +89,17 @@ do
         function VoiceChat.addUser() end
 
         --No Docu
+        function VoiceChat.getIsRadioListRequest() end
+
+        --No Docu
+        function VoiceChat.setRadioListRequest() end
+
+        --No Docu
         function VoiceChat.changeSlot() end
 
         --No Docu
         function VoiceChat.changeVoiceChatOption() end
- 
+
         --No Docu
         function VoiceChat.deleteRoom() end
 
