@@ -26,7 +26,44 @@ do
 
     --classes
     do
+        --Static object spawn data
+        do
+            ---What coalition.addStaticObject takes. This is a SINGLE object, not the
+            ---{ group = {...} } wrapper the mission file uses for groups.
+            ---@class Static_Object_DATA
+            ---@field type TypeNames_Structures|string the static's type name
+            ---@field name string must be unique -- an existing object of the same name is destroyed
+            ---@field x number
+            ---@field y number
+            ---@field heading number RADIANS, not degrees
+            ---@field category? string "Heliports", "Fortifications", "Cargos", ...
+            ---@field shape_name? string model shape, needed by some categories
+            ---@field unitId? number generated when absent or already taken
+            ---@field groupId? number
+            ---@field livery_id? string
+            ---@field dead? boolean spawn it already wrecked
+            ---@field hidden? boolean
+            ---@field hiddenOnPlanner? boolean
+            ---@field hiddenOnMFD? boolean
+            ---@field mass? number cargo mass in kg -- only on cargo statics
+            ---@field canCargo? boolean whether helicopters may sling it
+            ---@field rate? number score awarded for destroying it
+            ---@field linkUnit? number unitId this static is attached to
+            ---@field offsets? { x: number, y: number, angle: number } position relative to linkUnit, angle in radians
 
+            ---What coalition.addGroup takes: one group table, the same shape the
+            ---mission file stores under country.<category>.group[i].
+            ---@alias Group_DATA Plane_Group_DATA_group|Vehicle_Group_DATA_group
+        end
+
+        --Reference point
+        do
+            ---A JTAC reference point, as coalition.addRefPoints / getRefPoints handle them.
+            ---@class RefPoint
+            ---@field callsign number
+            ---@field type number
+            ---@field point vec3
+        end
     end
 
     ---The coalition singleton contains functions that gets information on the all of the units within the mission. It also has two of the most powerful functions that are capable of spawning groups and static objects into the mission.
@@ -62,27 +99,25 @@ do
         ---@return Group?
         ---@param countryId country.id
         ---@param groupCategory Group.Category
-        ---@param groupData table
+        ---@param groupData Group_DATA
         function coalition.addGroup(countryId, groupCategory, groupData) end
 
         ---Creates a new reference point belonging to the specified coalition. Reference points are used by JTACs.
         ---https://wiki.hoggitworld.com/view/DCS_func_addRefPoint
         ---@param coalitionId coalition.side
-        ---@param refPoint table
-        ---@return function
+        ---@param refPoint RefPoint
         function coalition.addRefPoints(coalitionId, refPoint) end
 
         ---Dynamically spawns a static object belonging to the specified country into the mission. This function follows the same rules as coalition.addGroup except for the object table not perfectly matching the format of a static object as seen in the mission file. Static Objects name cannot be shared with an existing object, if it is the existing object will be destroyed on the spawning of the new object. - If unitId is not specified or matches an existing object, a new Id will be generated. - Coalition of the object is defined based on the country the object is spawning to.
         ---https://wiki.hoggitworld.com/view/DCS_func_addStaticObject
         ---@return StaticObject?
         ---@param countryId country.id
-        ---@param groupData table
+        ---@param groupData Static_Object_DATA
         function coalition.addStaticObject(countryId, groupData) end
 
         --No Docu
         ---@param unk string
         ---@param ... unknown
-        ---@return function
         function coalition.add_dyn_group(unk, ...) end
 
         --No Docu
@@ -102,7 +137,7 @@ do
 
         ---Returns the enumarator coalitionId that a specified country belongs to.
         ---@param countryId country.id
-        ---@return coalition.side number gives you the side number
+        ---@return coalition.side
         function coalition.getCountryCoalition(countryId) end
 
         --No Docu
@@ -117,7 +152,7 @@ do
 
         ---Returns the position of a coalitions "bullseye" as specified in the mission editor.
         ---@param coalitionId coalition.side
-        ---@return vec3 class
+        ---@return vec3
         function coalition.getMainRefPoint(coalitionId) end
 
         ---Returns a table of unit objects that are currently occupied by players. Function is useful in multiplayer to easily filter client aircraft from everything else.
@@ -129,7 +164,7 @@ do
         ---Returns a table of reference points as defined by the mission editor or added via scripting. Reference points are used by JTACs.
         ---https://wiki.hoggitworld.com/view/DCS_func_getRefPoints
         ---@param coalitionId coalition.side
-        ---@return table
+        ---@return table<number, RefPoint>
         function coalition.getRefPoints(coalitionId) end
 
         ---Returns a table of unit objects that provide a given service to player controlled aircraft. Services are ATC, AWACS, TANKER, and FAC.

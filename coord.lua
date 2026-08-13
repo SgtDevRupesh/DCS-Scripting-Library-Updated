@@ -46,22 +46,22 @@ do
         ---Returns a point from latitude and longitude in the vec3 format.
         ---vec3 coord.LLtoLO(GeoCoord latitude , GeoCoord longitude , number altitude)
         ---https://wiki.hoggitworld.com/view/DCS_func_LLtoLO
-        ---@return vec3 vec3
-        ---@param latitude number GeoCoord
-        ---@param longitude number GeoCoord
-        ---@param altitude? number
+        ---@return vec3
+        ---@param latitude number decimal degrees
+        ---@param longitude number decimal degrees
+        ---@param altitude? number metres MSL, defaults to 0
         function coord.LLtoLO(latitude, longitude, altitude) end
 
         ---Returns an MGRS table from the latitude and longitude coordinates provided. Note that in order to get the MGRS coordinate from a vec3 you must first use coord.LOtoLL on it.
         ---https://wiki.hoggitworld.com/view/DCS_func_LLtoMGRS
-        ---@return MGRS MGRS
-        ---@param latitude any GeoCoord
-        ---@param longitude any GeoCoord
+        ---@return MGRS
+        ---@param latitude number decimal degrees
+        ---@param longitude number decimal degrees
         function coord.LLtoMGRS(latitude, longitude) end
 
         ---Returns multiple values of a given vec3 point in latitude, longitude, and altitude.
         ---https://wiki.hoggitworld.com/view/DCS_func_LOtoLL
-        ---@return number latitude, number longitude, number altitude
+        ---@return number latitude, number longitude, number altitude latitude/longitude in decimal degrees
         ---@param vec3 vec3
         function coord.LOtoLL(vec3) end
 

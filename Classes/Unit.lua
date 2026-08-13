@@ -242,6 +242,7 @@ do
 
     ---Represents units: airplanes, helicopters, vehicles, ships and armed ground structures.
     ---https://wiki.hoggitworld.com/view/DCS_Class_Unit
+    ---@enum Unit.RefuelingSystem
     Unit.RefuelingSystem = {
         BOOM_AND_RECEPTACLE = 0,
         PROBE_AND_DROGUE = 1
@@ -310,7 +311,7 @@ do
 
         ---Returns an instance of the calling class for the object of a specified name. The objects name is defined either in the mission editor or within functions that can dynamically spawn objects. All static objects and unit names must be unique. However groups may have the same name as a unit or static Unit. This function can provide access to non activated units and groups.
         ---https://wiki.hoggitworld.com/view/DCS_func_getByName
-        ---@return self?
+        ---@return Unit? found nil when nothing in the mission carries that name
         ---@param name string
         function Unit.getByName(name) end
 
@@ -344,7 +345,7 @@ do
 
         ---Returns the controller of the specified Unit. Ships and ground units can only be controlled at a group level. Airplanes and helicopters can be controlled at both a group and unit level.
         ---https://wiki.hoggitworld.com/view/DCS_func_getController
-        ---@return Controller class
+        ---@return Controller
         function Unit.getController(self) end
 
         ---Returns an enumerator that defines the country that an object currently belongs to. Function also works with Unit, Static Object, Airbase, Weapon
@@ -354,18 +355,18 @@ do
 
         ---Return a description table of the given Unit. Table entries are dependent on the category of object and the sub-categories that may exist within that object type. Function also works with Unit, Weapon, Static Object, Scenery Object, Airbase.
         ---https://wiki.hoggitworld.com/view/DCS_func_getDesc
-        ---@return decs_Unit class
+        ---@return decs_Unit
         function Unit.getDesc(self) end
 
         ---Return a description table of the specified Object type. Object does not need to be in the mission in order to query its data. Function works with Unit, Static Object, Scenery Object, Airbase.
         ---https://wiki.hoggitworld.com/view/DCS_func_getDescByName
-        ---@return decs_Unit class
-        ---@param typeName string
+        ---@return decs_Unit
+        ---@param typeName TypeNames|string
         function Unit.getDescByName(typeName) end
 
         ---Returns the number of infantry that can be embark onto the aircraft. Only returns a value if run on airplanes or helicopters. Returns nil if run on ground or ship units.
         ---https://wiki.hoggitworld.com/view/DCS_func_getDescentCapacity
-        ---@return number
+        ---@return number? capacity nil on ground and ship units
         function Unit.getDescentCapacity(self) end
 
         --No Docu
@@ -403,7 +404,7 @@ do
 
         ---Returns the Group object that the Unit belongs to.
         ---https://wiki.hoggitworld.com/view/DCS_func_getGroup
-        ---@return Group class
+        ---@return Group
         function Unit.getGroup(self) end
 
         ---Returns a number which defines the unique mission id of a given Unit.
@@ -429,7 +430,7 @@ do
         ---Returns a table of friendly cargo objects indexed numerically and sorted by distance from the helicopter. Returns nil if used on any object other than a helicopter.
         ---up to ~2.5 km
         ---https://wiki.hoggitworld.com/view/DCS_func_getNearestCargos
-        ---@return table<number, StaticObject>
+        ---@return table<number, StaticObject>? cargos nil on anything that is not a helicopter
         function Unit.getNearestCargos(self) end
 
         --No Docu
@@ -453,12 +454,12 @@ do
 
         ---Returns a string value of the name of the player if the unit is currently controlled by a player. If a unit is controlled by AI the function returns nil.
         ---https://wiki.hoggitworld.com/view/DCS_func_getPlayerName
-        ---@return string
+        ---@return string? name nil when the unit is flown by the AI
         function Unit.getPlayerName(self) end
 
         ---Returns two values. The first value is a boolean indicating if any radar on the Unit is operational. The second value is the Object the radar is most interested in and/or actively tracking.
         ---https://wiki.hoggitworld.com/view/DCS_func_getRadar
-        ---@return boolean, Objects
+        ---@return boolean operational, Objects? tracked nil while the radar is tracking nothing
         function Unit.getRadar(self) end
 
         --No Docu
@@ -516,8 +517,8 @@ do
         ---Returns true if the unit has the specified sensors. If SensorType is not specified the function will return true if the unit has any type of sensors. Some sensorTypes have additional subcategories which can be used to further specify for certain sensors.
         ---https://wiki.hoggitworld.com/view/DCS_func_hasSensors
         ---@return boolean
-        ---@param SensorType Unit.SensorType
-        ---@param SubCategory Unit.OpticType|Unit.RadarType
+        ---@param SensorType? Unit.SensorType omit to test for sensors of ANY type
+        ---@param SubCategory? Unit.OpticType|Unit.RadarType only meaningful for OPTIC and RADAR
         function Unit.hasSensors(self, SensorType, SubCategory) end
 
         ---Returns a boolean value if the unit is activated. Units set to late activation would return false if checked by this function.

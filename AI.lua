@@ -257,6 +257,4 @@ do
         QUARTER = "Quarter",
         TWO = "Two",
     }
-
-    return AI
 end

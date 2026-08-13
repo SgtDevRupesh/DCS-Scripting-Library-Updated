@@ -57,6 +57,20 @@ do
             ---| 6 Two Dash
         end
 
+        --Enum_BigSmokePreset
+        do
+            ---trigger.action.effectSmokeBig presets.
+            ---@alias Enum_BigSmokePreset
+            ---| 1 Small smoke and fire
+            ---| 2 Medium smoke and fire
+            ---| 3 Large smoke and fire
+            ---| 4 Huge smoke and fire
+            ---| 5 Small smoke
+            ---| 6 Medium smoke
+            ---| 7 Large smoke
+            ---| 8 Huge smoke
+        end
+
         do
             ---@alias Enum_CTF_Color_Tag
             ---| 0 Disable
@@ -138,7 +152,7 @@ do
 
             ---Adds a command to the "F10 Other" radio menu allowing players to call commands and set flags within the mission. Command is added for a specific group designated by its groupId. The string name is the text that will be displayed in the F10 Other menu and is also used in the function to remove the command from the menu.
             ---https://wiki.hoggitworld.com/view/DCS_func_addOtherCommandForGroup
-            ---@param groupId number
+            ---@param groupId number the id from Group.getID(), not the Group object
             ---@param name string
             ---@param userFlagName string
             ---@param userFlagValue number
@@ -150,8 +164,8 @@ do
             ---@param id number
             ---@param startPoint vec3
             ---@param endPoint vec3
-            ---@param color table
-            ---@param fillColor table
+            ---@param color Enum_color_tbl
+            ---@param fillColor Enum_color_tbl
             ---@param lineType Enum_LineTypes
             ---@param readOnly? boolean
             ---@param message? string
@@ -165,8 +179,8 @@ do
             ---@param id number
             ---@param center vec3
             ---@param radius number
-            ---@param color table
-            ---@param fillColor table
+            ---@param color Enum_color_tbl
+            ---@param fillColor Enum_color_tbl
             ---@param lineType Enum_LineTypes
             ---@param readOnly? boolean
             ---@param message? string
@@ -178,9 +192,9 @@ do
             ---https://wiki.hoggitworld.com/view/DCS_func_ctfColorTag
             ---@Example 	The following creates a blue smoke plume on an aircraft named "IWishEDWouldDocumentFeaturesMore" that will be enabled as long as the aircraft is above 1000 meters.
             ---trigger.action.ctfColorTag('IWishEDWouldDocumentFeaturesMore', 5, 1000)
-            ---@param unitName string
-            ---@param smokeColor Enum_CTF_Color_Tag
-            ---@param altitude? number
+            ---@param unitName string the unit's NAME, not a Unit object
+            ---@param smokeColor Enum_CTF_Color_Tag 0 disables the plume
+            ---@param altitude? number metres -- below this the plume stops, above it resumes
             function trigger.action.ctfColorTag(unitName, smokeColor, altitude) end
 
             ---Deactivates the specified group. Calls the Group.destroy function.
@@ -200,9 +214,9 @@ do
             ---Density is any value from 0 to 1. For example 0.5. Name is a unique name given to the smoke mark to be used with removing it.
             ---https://wiki.hoggitworld.com/view/DCS_func_effectSmokeBig
             ---@param vec3 vec3
-            ---@param smokePreset number
-            ---@param density number
-            ---@param name? string
+            ---@param smokePreset Enum_BigSmokePreset
+            ---@param density number 0 to 1
+            ---@param name? string unique name, needed to stop it again with effectSmokeStop
             function trigger.action.effectSmokeBig(vec3, smokePreset, density, name) end
 
             ---Stops a big smoke effect of the passed name. Used in conjunction with trigger.action.effectSmokeBig
@@ -238,7 +252,7 @@ do
             ---@param id number
             ---@param startPoint vec3
             ---@param endPoint vec3
-            ---@param color table
+            ---@param color Enum_color_tbl
             ---@param lineType Enum_LineTypes
             ---@param readOnly? boolean
             ---@param message? string
@@ -275,16 +289,22 @@ do
 
             ---Creates the defined shape on the F10 map. Uses the same definitions as the specific functions to create different shapes with the only difference being the first parameter is used to define the shape. This function does have an additional type of shape of "freeform" which allows you to create an 3+ vertices shape in any format you wish. Shape Ids:
             ---https://wiki.hoggitworld.com/view/DCS_func_markupToAll
+            ---The points are passed one after another, NOT as a table: how many the call
+            ---takes is decided by shapeId (1 line = 2 points, 6 quad = 4, 7 freeform = 3+).
+            ---color, fillColor, lineType, readOnly and message all follow the LAST point,
+            ---so their real position shifts with the shape.
+            ---@ExampleDesc A freeform triangle
+            ---@Example trigger.action.markupToAll(7, -1, 55, p1, p2, p3, {1,0,0,1}, {1,0,0,.2}, 1)
             ---@param shapeId Enum_ShapeID
             ---@param coalition coalition.side|-1
             ---@param id number
-            ---@param points vec3
-            ---@param color Enum_color_tbl|any
-            ---@param fillColor Enum_color_tbl|any
-            ---@param lineType Enum_LineTypes|any
-            ---@param readOnly? boolean|nil|any
-            ---@param message? string|nil|any
-            ---@param ... any
+            ---@param points vec3 the FIRST point; the rest follow in the varargs
+            ---@param color Enum_color_tbl
+            ---@param fillColor Enum_color_tbl
+            ---@param lineType Enum_LineTypes
+            ---@param readOnly? boolean
+            ---@param message? string
+            ---@param ... any further points, then the trailing arguments above
             function trigger.action.markupToAll(shapeId, coalition, id, points, color, fillColor, lineType, readOnly,
                                                 message, ...)
             end
@@ -374,8 +394,8 @@ do
             ---@param point2 vec3
             ---@param point3 vec3
             ---@param point4 vec3
-            ---@param color table
-            ---@param fillColor table
+            ---@param color Enum_color_tbl
+            ---@param fillColor Enum_color_tbl
             ---@param lineType Enum_LineTypes
             ---@param readOnly? boolean
             ---@param message? string
@@ -401,9 +421,9 @@ do
             ---@param id number
             ---@param startPoint vec3
             ---@param EndPoint vec3
-            ---@param color table
-            ---@param fillColor table
-            ---@param lineType number
+            ---@param color Enum_color_tbl
+            ---@param fillColor Enum_color_tbl
+            ---@param lineType Enum_LineTypes
             ---@param readOnly? boolean
             ---@param message? string
             function trigger.action.rectToAll(coalition, id, startPoint, EndPoint, color, fillColor, lineType, readOnly,
@@ -451,13 +471,13 @@ do
             ---Updates the color of the specified mark to be the new value. Color format is {r, g, b, alpha} with values ranging from 0 to 1.
             ---https://wiki.hoggitworld.com/view/DCS_func_setMarkupColor
             ---@param id number
-            ---@param color table
+            ---@param color Enum_color_tbl
             function trigger.action.setMarkupColor(id, color) end
 
             ---Updates the colorfill of the specified mark to be the new value. Color format is {r, g, b, alpha} with values ranging from 0 to 1.
             ---https://wiki.hoggitworld.com/view/DCS_func_setMarkupColorFill
             ---@param id number
-            ---@param colorFill table
+            ---@param colorFill Enum_color_tbl
             function trigger.action.setMarkupColorFill(id, colorFill) end
 
             ---Updates the font size of the specified mark to be the new value. If the id of the passed mark does not have text then nothing will happen.
@@ -531,8 +551,8 @@ do
             ---@param coalition coalition.side|-1
             ---@param id number
             ---@param point vec3
-            ---@param color table
-            ---@param fillColor table
+            ---@param color Enum_color_tbl
+            ---@param fillColor Enum_color_tbl
             ---@param fontSize number
             ---@param readOnly boolean
             ---@param text string
@@ -542,26 +562,24 @@ do
         --misc
         do
             --No Docu
-            ---comment
             ---@param trgdata {actions:string, func:string, flag:boolean, conditions:string}
             ---@return table<"func", string>
             function trigger.misc.addTrigger(trgdata) end
 
             --No Docu
-            ---comment
             ---@param zonedata table
             ---@return Trig_zone_data
             function trigger.misc.addZone(zonedata) end
 
             ---Returns the value of a user flag.
             ---https://wiki.hoggitworld.com/view/DCS_func_getUserFlag
-            ---@return number|boolean
+            ---@return number value 0 when the flag was never set
             ---@param flagNumFlagName string|number
             function trigger.misc.getUserFlag(flagNumFlagName) end
 
             ---Returns a trigger zone table of a given name
             ---https://wiki.hoggitworld.com/view/DCS_func_getZone
-            ---@return TriggerZone class
+            ---@return TriggerZone? zone nil when no zone of that name exists
             ---@param zoneName string
             function trigger.misc.getZone(zoneName) end
         end

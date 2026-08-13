@@ -38,19 +38,20 @@ do
         ---Returns the temperature and pressure at a given point in 3d space. Temperature is returned in Kelvins Pressure is returned in Pascals
         ---https://wiki.hoggitworld.com/view/DCS_func_getTemperatureAndPressure
         ---@param vec3 vec3
-        ---@return number Kelvins , number Pascals
+        ---@return number temperature Kelvin
+        ---@return number pressure Pascals
         function atmosphere.getTemperatureAndPressure(vec3) end
 
         ---Returns a velocity vector of the wind at a specified point
         ---https://wiki.hoggitworld.com/view/DCS_func_getWind
         ---@param vec3 vec3
-        ---@return vec3
+        ---@return vec3 wind a velocity vector in m/s, pointing the way the wind blows TO
         function atmosphere.getWind(vec3) end
 
         ---Returns a velocity vector of the wind at a specified point, this time factoring turbulence into the equation.
-        ---@param vec3 vec3
-        ---@return vec3
         ---https://wiki.hoggitworld.com/view/DCS_func_getWindWithTurbulence
+        ---@param vec3 vec3
+        ---@return vec3 wind a velocity vector in m/s, pointing the way the wind blows TO
         function atmosphere.getWindWithTurbulence(vec3) end
     end
 end

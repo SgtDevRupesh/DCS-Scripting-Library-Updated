@@ -27,14 +27,22 @@ do
 
     --classes
     do
-
+        --Log_level
+        do
+            ---A log level / output rule: one of the log.* constants, or several of
+            ---them added together. They are BIT FLAGS, so log.ERROR + log.WARNING is
+            ---a valid value even though no single constant carries that number --
+            ---which is why this is an alias over number and not an @enum.
+            ---@alias Log_level number
+        end
     end
 
-    --No Docu
+    ---The log singleton writes into dcs.log directly, below env.info / env.warning /
+    ---env.error. The constants sit FLAT on the log table alongside its functions --
+    ---log.INFO, log.write -- exactly as DCS exposes them.
+    ---Several names share a value on purpose (ERROR and THREAD are both 8, MESSAGE
+    ---and ASYNC both 0); that is DCS's own table, not a transcription slip.
     ---@class log
-    log = {}
-
-    ---@enum Log_level
     log =
     {
         MESSAGE          = 0,

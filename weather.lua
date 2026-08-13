@@ -31,9 +31,10 @@ do
     end
 
 
-    ---added in DCS 2.9.10 update
-    ---part of 'world' class
-    ---@class weather
+    ---Fog control, added in the DCS 2.9.10 update. Lives ON the world singleton,
+    ---so it is spelled world.weather.* -- there is no standalone `weather` global.
+    ---This drives the LIVE fog. The mission's saved fog setup is env.mission.weather.fog2.
+    ---@class world.weather
     world.weather = {}
 
     --Functions
@@ -57,7 +58,7 @@ do
         ---Thickness: in meters 100 to 5000
         ---The speed at which the visibility and thickness changes is based on the time between keys and the values that visibility and thickness are being set to.
         ---When the function is passed an empty table {} or nil the fog animation will be discarded and whatever the current thickness and visibility are set to will remain.
-        ---@param fogAnimationKeys_discard? table<number, table<number, number>> Time: in seconds 0 to infinity | Visibility: in meters 100 to 100000 | Thickness: in meters 100 to 5000
+        ---@param fogAnimationKeys_discard? table<number, [number, number, number]> each key is {time, visibility, thickness}. Time: seconds from now, and must increase key to key | Visibility: metres, 100 to 100000 | Thickness: metres, 100 to 5000. Pass {} or nil to discard the animation
         function world.weather.setFogAnimation(fogAnimationKeys_discard) end
 
         ---https://wiki.hoggitworld.com/view/DCS_func_setFogThickness

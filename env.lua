@@ -662,7 +662,7 @@ do
                         ---@field params Tasks_TaskWrapper_WrappedAction.params_command Configuration parameters for the WrappedAction task.
 
                         ---@class Tasks_TaskWrapper_WrappedAction.params_command
-                        ---@field action table<Task_Commands>
+                        ---@field action Task_Commands the single command or option being wrapped
                     end
                 end
 
@@ -908,7 +908,7 @@ do
                         ---@field groupId number The unique groupId of the group to be escorted (required).
                         ---@field pos vec3 The relative position (in 3D space) that the controlled flight will form up on (required).
                         ---@field engagementDistMax number The maximum distance within which the AI will engage threats from the escorted group (required).
-                        ---@field targetTypes table<Attributes> An array of object attributes that the AI will engage (required).
+                        ---@field targetTypes Attributes[] An array of object attributes that the AI will engage (required).
                         ---@field lastWptIndexFlag? boolean If true, the AI will follow the group until it reaches a specified waypoint (optional, default is true).
                         ---@field lastWptIndex? number The waypoint index at which the following group will stop its task. Must be set if lastWptIndexFlag is set to false (optional, default is -1).
                     end
@@ -1063,7 +1063,7 @@ do
                         ---@field engagementDistMax number Defines the length of the orbit around the ground group. Helicopters will fly up to this distance before returning to the escorted group.
                         ---@field lastWptIndexFlag boolean (Default: True) If true, the AI will follow the group until it reaches a specified waypoint.
                         ---@field lastWptIndex number (Default: -1) Identifies the waypoint at which the escorting helicopters will stop their task. Must be set if `lastWptIndexFlag` is not false.
-                        ---@field targetTypes table<Attributes> An array of object attributes which the AI will engage.
+                        ---@field targetTypes Attributes[] An array of object attributes which the AI will engage.
                         ---@field lastWptIndexFlagChangedManually? boolean (Optional) Possibly indicates if the `lastWptIndexFlag` was manually changed. Its exact purpose is unclear, but it is set to true in the mission editor.
                     end
 
@@ -1101,7 +1101,7 @@ do
                         ---@class Taks_Params_EngageTargets
                         ---@field maxDist number (Optional) The maximum distance in meters from their route that the group will deviate to engage a target.
                         ---@field maxDistEnabled boolean (Optional) Required to be true if `maxDist` is used. Determines whether `maxDist` should be checked.
-                        ---@field targetTypes table<Attributes> An array of attribute names defining valid targets for engagement.
+                        ---@field targetTypes Attributes[] An array of attribute names defining valid targets for engagement.
                         ---@field priority number (Optional) The priority of the task. Lower values indicate higher priority. Defaults to 0.
                     end
 
@@ -1118,7 +1118,7 @@ do
                         ---@class Taks_Params_EngageTargetsInZone
                         ---@field point vec2 The center point of the zone where the group will engage targets.
                         ---@field zoneRadius number The radius in meters defining the size of the engagement zone.
-                        ---@field targetTypes table<string> An array of attribute names defining valid targets for engagement.
+                        ---@field targetTypes Attributes[] An array of attribute names defining valid targets for engagement.
                         ---@field priority number (Optional) The priority of the task. Lower values indicate higher priority. Defaults to 0.
                     end
 
@@ -1661,6 +1661,109 @@ do
             end
         end
 
+        --[[MISSION TABLE SHAPES]]
+        do
+            --Weather
+            do
+                ---One wind layer of env.mission.weather.wind.
+                ---@class Mission_wind_layer
+                ---@field speed number m/s
+                ---@field dir number degrees, the bearing the wind blows FROM
+
+                ---env.mission.weather.fog2.manual -- three PARALLEL arrays, one
+                ---keyframe per index. Same columns world.weather.setFogAnimation takes.
+                ---@class Mission_fog_keys
+                ---@field time table<number, number> seconds
+                ---@field visibility table<number, number> metres, 100 to 100000
+                ---@field thickness table<number, number> metres, 100 to 5000
+
+                ---One dynamic-weather cyclone.
+                ---@class Mission_cyclone
+                ---@field centerX number metres
+                ---@field centerZ number metres
+                ---@field rotation number
+                ---@field ellipticity number
+                ---@field pressure_excess number offset from normal pressure at the centre
+                ---@field pressure_spread number how big the cyclone is
+
+                ---Pre-2.9 fog, superseded by fog2.
+                ---@class Mission_legacy_fog
+                ---@field thickness number metres
+                ---@field visibility number metres
+            end
+
+            --Goals and triggers
+            do
+                ---One block of generated goal code in env.mission.result. Every entry
+                ---is Lua SOURCE the editor produced, not a callable function.
+                ---@class Mission_result_block
+                ---@field conditions table<number, string>
+                ---@field actions table<number, string>
+                ---@field func table<number, string>
+
+                ---One row of env.mission.trigrules or env.mission.goals.
+                ---@class Mission_trigger_rule
+                ---@field predicate string "triggerOnce", "triggerStart", "triggerContinuous", ...
+                ---@field rules table<number, Mission_trigger_entry> the conditions
+                ---@field actions table<number, Mission_trigger_entry>
+                ---@field comment string the trigger's name in the editor list
+                ---@field eventlist? string non-empty means the trigger is event driven
+                ---@field colorItem? number row colour in the editor list
+                ---@field score? number goals only
+                ---@field coalitionlist? string goals only -- "blue", "red", "offline" or "all"
+
+                ---One condition or action inside a Mission_trigger_rule. Beyond the keys
+                ---below the entry carries whatever that predicate needs (zone, unit,
+                ---flag, seconds, ...), which is why it is not fully typed here.
+                ---@class Mission_trigger_entry
+                ---@field predicate string e.g. "c_time_after", "a_out_text"
+                ---@field text? string
+                ---@field KeyDict_text? string dictionary key for text
+                ---@field comment? string
+                ---@field KeyDict_comment? string
+                ---@field radiotext? string
+                ---@field KeyDict_radiotext? string
+            end
+
+            --Flight plans
+            do
+                ---One planner flight plan from env.mission.flightPlans.
+                ---@class Mission_flight_plan
+                ---@field id number
+                ---@field name string
+                ---@field dateStr string
+                ---@field color string
+                ---@field type string
+                ---@field hidden boolean
+                ---@field doghouseOn boolean
+                ---@field corridorDim number
+                ---@field dayAlt number
+                ---@field nightAlt number
+                ---@field initialSpeed number
+                ---@field initialAlt number
+                ---@field legMark string
+                ---@field bingoFuel number
+                ---@field playTime number
+                ---@field fuelType string
+                ---@field fuelQuantityUnit string
+                ---@field fuelBurnUnit string
+                ---@field fuelQuantity number
+                ---@field fuelBurnRate number
+                ---@field missionConf string
+                ---@field airTasking string
+                ---@field points table<number, Mission_flight_plan_point>
+
+                ---@class Mission_flight_plan_point
+                ---@field pointId number
+                ---@field id number
+                ---@field x number
+                ---@field y number
+                ---@field alt number
+                ---@field speed number
+                ---@field linkSnap? number the object this point is snapped to
+            end
+        end
+
         --[[WAREHOUSE DATA]]
         do
             --Aircraft_table
@@ -1675,8 +1778,17 @@ do
             --Sup table
             do
                 ---@class Warehouse_data_sup
-                ---@field Id number
-                ---@field type "airports"|string
+                ---@field Id number an airdrome number when type is "airports", a unitId when "warehouses"
+                ---@field type "airports"|"warehouses"
+            end
+
+            --Weapon stock table
+            do
+                ---One entry of Warehouse_data.weapons. A plain 1-based array with no
+                ---key of its own -- wsType is the only handle the item has.
+                ---@class Warehouse_data_weapon
+                ---@field initialAmount number
+                ---@field wsType Wherehouse_recource_map see https://wiki.hoggitworld.com/view/DCS_func_getResourceMap
             end
             ---@class Warehouse_data
             ---@field allowHotStart boolean
@@ -1696,8 +1808,9 @@ do
             ---@field OperatingLevel_Eqp number
             ---@field gasoline table<"InitFuel", number>
             ---@field aircrafts table<"helicopters"|"planes", table<TypeNames_AC|TypeNames_Heli, Warehouse_data_aircraft>>|{}
-            ---@field weapons {}|table
+            ---@field weapons table<number, Warehouse_data_weapon>|{} blanked entirely when unlimitedMunitions is set
             ---@field OperatingLevel_Fuel number
+            ---@field OperatingLevel? number legacy, pre-split. Old missions carry this INSTEAD of the three OperatingLevel_* above
             ---@field size number
         end
     end
@@ -2011,17 +2124,26 @@ do
         ---@type table
         requiredModules         = {}, -- Example placeholder for required modules
 
-        --- Conditions and actions defined by mission goals to decide if a mission is "won".
+        --- Generated goal-evaluation code, split per side. Every entry is a block of
+        --- Lua SOURCE produced by the editor from mission.goals, not a live function.
         result                  =
         {
-            --- Mission conditions
-            ---@type table
-            conditions = {}, -- Example placeholder for mission conditions
+            --- Number of goals -- matches #env.mission.goals.
+            ---@type number
+            total   = 0,
 
-            --- Mission actions
-            ---@type table
-            actions    = {} -- Example placeholder for mission actions
-        },                  -- end of ["result"]
+            --- Goals scored for neither side.
+            ---@type Mission_result_block
+            offline = { conditions = {}, actions = {}, func = {} },
+
+            --- Goals scored for blue.
+            ---@type Mission_result_block
+            blue    = { conditions = {}, actions = {}, func = {} },
+
+            --- Goals scored for red.
+            ---@type Mission_result_block
+            red     = { conditions = {}, actions = {}, func = {} },
+        }, -- end of ["result"]
 
         --- Time in seconds since midnight for the date set when the mission starts.
         ---@type number
@@ -2031,8 +2153,11 @@ do
         ---@type string
         sortie                  = "",
 
-        --- Name of the map the mission takes place on.
-        ---@type string|'Caucasus'|'Nevada'|'Normandy'|'PersianGulf'|'TheChannel'|'Syria'|'MarianaIslands'|'Falklands'|'SinaiMap'|'Kola'|'Afghanistan'|'Iraq'|'GermanyCW'
+        --- Name of the map the mission takes place on. This is the terrain module's
+        --- entry.lua id, NOT its display name -- the Cold War Germany map is
+        --- "GermanyCW", Sinai is "SinaiMap", and the WWII Marianas is
+        --- "MarianaIslandsWWII".
+        ---@type string|'Caucasus'|'Nevada'|'Normandy'|'PersianGulf'|'TheChannel'|'Syria'|'MarianaIslands'|'MarianaIslandsWWII'|'Falklands'|'SinaiMap'|'Kola'|'Afghanistan'|'Iraq'|'GermanyCW'
         theatre                 = "",
 
         --- Table of trigger zones indexed numerically.
@@ -2043,9 +2168,19 @@ do
             {
                 [44] =
                 {
-                    --- Radius of the trigger zone
+                    --- Radius of the trigger zone. Circular zones (type 0) only.
                     ---@type number
                     radius     = 3000, -- Replace with actual radius
+
+                    --- Rotation of the zone, in DEGREES. Quad zones (type 2) only.
+                    ---@type number
+                    heading    = 0,
+
+                    --- unitId this zone is attached to. While it is set, x/y and the
+                    --- verticies below are OFFSETS relative to that unit's current
+                    --- position, not world coordinates. Absent on a free-standing zone.
+                    ---@type number?
+                    linkUnit   = nil,
 
                     --- Unique identifier for the trigger zone
                     ---@type number
@@ -2071,7 +2206,9 @@ do
                         [4] = 0.15 -- Replace with actual alpha component
                     },             -- end of ["color"]
 
-                    --- Properties of the trigger zone
+                    --- Zone properties, as key/value ROWS -- an array of {key, value}
+                    --- pairs, not a map. Read them by walking the array.
+                    ---@type table<number, {key: string, value: string}>
                     properties =
                     {
                         [1] =
@@ -2126,12 +2263,14 @@ do
                     ---@type string
                     name       = "OBJB20", -- Replace with actual name
 
-                    --- Type of the trigger zone
-                    ---@type number
+                    --- Shape of the trigger zone: 0 circular (uses radius), 2 quad
+                    --- (uses verticies).
+                    ---@type 0|2
                     type       = 2, -- Replace with actual type
 
-                    --- Vertices of the polygon defining the trigger zone
-                    ---@type table
+                    --- Corners of a quad zone (type 2), four of them, written
+                    --- counter-clockwise from the top-left. ED's spelling -- one "i".
+                    ---@type table<number, vec2>
                     verticies  =
                     {
                         [1] =
@@ -2193,39 +2332,194 @@ do
 
         }, -- end of ["trig"]
 
-        --- Another table containing data on triggers.
-        ---@type table
-        trigRules               =
+        --- The editor-side trigger definitions -- one entry per row of the ME trigger
+        --- list, each with its predicate, conditions and actions.
+        --- NOTE the key is all lowercase: env.mission.trigrules, NOT trigRules.
+        ---@type table<number, Mission_trigger_rule>
+        trigrules               =
         {
 
-        }, -- end of ["trigRules"]
+        }, -- end of ["trigrules"]
+
+        --- Mission goals. Same shape as trigrules, plus score and coalitionlist.
+        ---@type table<number, Mission_trigger_rule>
+        goals                   =
+        {
+
+        }, -- end of ["goals"]
 
         --- Value used by the mission editor to know roughly which iteration of the editor the mission was saved in.
         ---@type number
         version                 = 0,
 
-        --- Table with weather data.
+        --- Planner flight plans drawn on the F10 map.
+        ---@type table<number, Mission_flight_plan>
+        flightPlans             = {},
+
+        --- Multiplayer server-browser image for the mission.
+        ---@type table<number, string>
+        pictureFileNameServer   = {},
+
+        --- Custom ground formations referenced by triggers. Editor-private layout.
         ---@type table
+        customFormations        = {},
+
+        --- Sound files the mission registered (radio items, trigger actions).
+        ---@type table
+        sounds                  = {},
+
+        --- Only present on generated missions -- whatever the generator stashed.
+        ---@type table
+        generatorParams         = {},
+
+        --- Per-language briefing table, the newer companion to descriptionText.
+        ---@type table
+        descriptionTbl          = {},
+
+        --- Passthrough table. The editor copies it verbatim and never reads it.
+        ---@type table
+        ext_loader              = {},
+
+        --- Mission init script, run before the mission starts. Inline source.
+        ---@type string?
+        initScript              = nil,
+
+        --- Mission init script, as a path to a file inside the .miz.
+        ---@type string?
+        initScriptFile          = nil,
+
+        --- Dictionary keys for the localised top-level strings. Present only once the
+        --- mission has been saved through the editor -- resolve with env.getValueDictByKey.
+        ---@type string?
+        KeyDict_sortie          = nil,
+        ---@type string?
+        KeyDict_descriptionText = nil,
+        ---@type string?
+        KeyDict_descriptionBlueTask = nil,
+        ---@type string?
+        KeyDict_descriptionRedTask = nil,
+        ---@type string?
+        KeyDict_descriptionNeutralsTask = nil,
+
+        --- The mission's weather, exactly as the editor saved it. This is the STATIC
+        --- mission setup -- for what the sim is doing right now use the atmosphere
+        --- singleton (wind, temperature, pressure) and world.weather (fog).
         weather                 =
         {
-            --- Wind data
-            ---@type table
-            wind        =
+            --- Wind at three fixed altitudes. Direction is the compass bearing the wind
+            --- blows FROM, in degrees; speed is m/s. This is the opposite convention to
+            --- atmosphere.getWind, which returns a velocity vector pointing where the
+            --- air is going.
+            wind          =
             {
-                --- Wind speed
-                ---@type number
-                speed     = 0,
-
-                --- Wind direction
-                ---@type number
-                direction = 0
+                ---@type Mission_wind_layer
+                atGround = { speed = 0, dir = 0 },
+                ---@type Mission_wind_layer
+                at2000   = { speed = 0, dir = 0 },
+                ---@type Mission_wind_layer
+                at8000   = { speed = 0, dir = 0 },
             }, -- end of ["wind"]
 
-            --- Temperature data
-            ---@type number
-            temperature = 15
+            clouds        =
+            {
+                --- Name of the cloud preset, or nil when the clouds are hand-built.
+                ---@type string?
+                preset     = nil,
 
-            -- Add more weather attributes as needed
+                --- Cloud base in metres MSL.
+                ---@type number
+                base       = 0,
+
+                --- Cloud layer thickness in metres.
+                ---@type number
+                thickness  = 0,
+
+                --- Cloud density, 0 to 10.
+                ---@type number
+                density    = 0,
+
+                --- Precipitation.
+                ---@type 0|1|2|3|4 0 none, 1 rain, 2 thunderstorm, 3 snow, 4 snowstorm
+                iprecptns  = 0,
+            }, -- end of ["clouds"]
+
+            --- Fog, as of the 2.9 rework. mode picks how it behaves; the manual
+            --- keyframes are only present while mode is 4.
+            fog2          =
+            {
+                --- 1 off, 2 automatic, 4 manual keyframes.
+                ---@type 1|2|4
+                mode   = 1,
+
+                --- Manual keyframes. Three parallel arrays -- index i of each describes
+                --- the same key. Same columns world.weather.setFogAnimation takes.
+                ---@type Mission_fog_keys?
+                manual = nil,
+            }, -- end of ["fog2"]
+
+            --- Ice halo. A newer key, absent from older missions.
+            halo          =
+            {
+                --- "off", "auto", or a preset id.
+                ---@type string
+                preset         = "off",
+
+                --- nil while preset is "off".
+                ---@type string?
+                crystalsPreset = nil,
+            }, -- end of ["halo"]
+
+            visibility    =
+            {
+                --- Visibility in metres.
+                ---@type number
+                distance = 80000,
+            }, -- end of ["visibility"]
+
+            season        =
+            {
+                --- Temperature at sea level, in CELSIUS.
+                ---@type number
+                temperature = 15,
+            }, -- end of ["season"]
+
+            --- Turbulence at ground level.
+            ---@type number
+            groundTurbulence = 0,
+
+            --- Whether the dust storm effect is on.
+            ---@type boolean
+            enable_dust      = false,
+
+            --- Dust density. Only meaningful while enable_dust is true.
+            ---@type number
+            dust_density     = 0,
+
+            --- Sea level pressure, in mmHg.
+            ---@type number
+            qnh              = 760,
+
+            --- Dynamic-weather cyclones. Empty unless atmosphere_type is 1.
+            ---@type table<number, Mission_cyclone>
+            cyclones         = {},
+
+            ---@type number
+            type_weather     = 0,
+
+            ---@type boolean
+            modifiedTime     = false,
+
+            --- 0 static (standard) atmosphere, 1 dynamic weather.
+            ---@type 0|1
+            atmosphere_type  = 0,
+
+            --- Legacy, pre-version-23 missions only. The editor folds these into
+            --- fog2.manual on load and then drops them, so on anything current they
+            --- are absent.
+            ---@type boolean?
+            enable_fog       = nil,
+            ---@type Mission_legacy_fog?
+            fog              = nil,
         } -- end of ["weather"]
     }     -- end of ["missionData"]
 

@@ -59,24 +59,28 @@ do
 
         ---Removes a scheduled function as defined by the functionId from executing. Essentially will "destroy" the function.
         ---https://wiki.hoggitworld.com/view/DCS_func_removeFunction
-        ---@return function
-        ---@param functionId number
+        ---@param functionId number the id handed back by timer.scheduleFunction
         function timer.removeFunction( functionId ) end
 
         ---Schedules a function to run at a time in the future. This is a very powerful function. The function that is called is expected to return nil or a number which will indicate the next time the function will be rescheduled. Use the second argument in that function to retrieve the current time and add the desired amount of delay (expressed in seconds).
+        ---modelTime is an ABSOLUTE model time, not a delay -- schedule with timer.getTime() + delay.
         ---https://wiki.hoggitworld.com/view/DCS_func_scheduleFunction
-        ---@generic ARG
+        ---@ExampleDesc Re-runs itself every 10 seconds, carrying a group name along
+        ---@Example timer.scheduleFunction(function(name, time)
+        ---@Example     env.info(name)
+        ---@Example     return time + 10
+        ---@Example end, 'tanks', timer.getTime() + 10)
+        ---@generic A
+        ---@param functionToCall fun(arg: A, time: number): number? return a model time to re-run at, or nil to stop
+        ---@param anyFunctionArguement A handed straight back to functionToCall
+        ---@param modelTime number absolute model time to first run at
         ---@return number functionId
-        ---@param anyFunctionArguement ARG functionArgs
-        ---@param functionToCall fun(ARG?:ARG, time?:number):number?
-        ---@param modelTime number time
         function timer.scheduleFunction( functionToCall, anyFunctionArguement, modelTime ) end
 
         ---Re-Schedules an already scheduled function to run at a different time in the future.
         ---https://wiki.hoggitworld.com/view/DCS_func_setFunctionTime
-        ---@return function
-        ---@param functionId number
-        ---@param modelTime number
+        ---@param functionId number the id handed back by timer.scheduleFunction
+        ---@param modelTime number absolute model time to run at instead
         function timer.setFunctionTime( functionId, modelTime ) end
     end
 end

@@ -29,8 +29,10 @@ do
     do
         --Player_id
         do
-            ---@class Player_id number not table
-            ---@field playerid number
+            ---A player's network id. It is a plain NUMBER, not a table -- the server
+            ---is always 1. Aliased so every net function that takes or returns one
+            ---reads as the same thing.
+            ---@alias Player_id number
         end
 
         --Net_player_info
@@ -48,12 +50,6 @@ do
         end
     end
 
-    ---The net singleton are a number of functions from the network API that work in the mission scripting environment. Notably for mission scripting purposes there is now a way to send chat, check if players are in Combined Arms slots, kick people from the server, and move players to certain slots.
-    ---https://wiki.hoggitworld.com/view/DCS_singleton_net
-    ---@class net
-    net = {}
-
-
     ---@alias net_statID
     ---| 0 PS_PING
     ---| 1 PS_CRASH
@@ -64,9 +60,13 @@ do
     ---| 6 PS_LAND
     ---| 7 PS_EJECT
 
-
-
+    ---The net singleton are a number of functions from the network API that work in the mission scripting environment. Notably for mission scripting purposes there is now a way to send chat, check if players are in Combined Arms slots, kick people from the server, and move players to certain slots.
+    ---Every constant below sits FLAT on the net table -- net.PS_PING, net.CHAT_ALL --
+    ---exactly as DCS exposes them; there are no net.stat / net.err sub-tables.
+    ---https://wiki.hoggitworld.com/view/DCS_singleton_net
+    ---@class net
     net = {
+        -- statistic ids for net.get_stat
         PS_PING = 0,
         PS_CRASH = 1,
         PS_CAR = 2,
@@ -76,11 +76,13 @@ do
         PS_LAND = 6,
         PS_EJECT = 7,
 
+        -- multiplayer game modes
         GAME_MODE_CONQUEST = 2,
         GAME_MODE_LAST_MAN_STANDING = 1,
         GAME_MODE_MISSION = 0,
         GAME_MODE_TEAM_DEATH_MATCH = 3,
 
+        -- connection / join failure reasons
         ERR_BAD_CALLSIGN = 102,
         ERR_BANNED = 101,
         ERR_CONNECT_FAILED = 2,
@@ -97,20 +99,21 @@ do
         ERR_TIMEOUT = 5,
         ERR_WRONG_VERSION = 3,
 
+        -- when a paused server resumes
         RESUME_MANUAL = 0,
         RESUME_ON_LOAD = 1,
         RESUME_WITH_CLIENTS = 2,
 
+        -- pseudo player ids for chat destinations
         CHAT_ALL = -1,
         CHAT_TEAM = -2,
-
     }
 
     --Functions
     do
         ---Executes a lua string in a given lua environment in the game.
         ---https://wiki.hoggitworld.com/view/DCS_func_dostring_in
-        ---@return string
+        ---@return string result whatever the chunk returned, rendered as a string
         ---@param state 'config'|'mission'|'export'|'gui'|'server'|'scripting'
         ---@param dostring string
         function net.dostring_in(state, dostring) end
@@ -136,9 +139,9 @@ do
 
         ---Returns a table of attributes for a given playerId. If optional attribute present only that value is returned Attributes:
         ---https://wiki.hoggitworld.com/view/DCS_func_get_player_info
-        ---@return Net_player_info --only full table if attribute is nil
-        ---@param playerID Player_id|number
-        ---@param attribute? 'id'|'name'|'side'|'slot'|'ping'|'ipaddr'|'ucid'
+        ---@return Net_player_info|string|number|nil info the full table only when attribute is nil, otherwise just that one field
+        ---@param playerID Player_id
+        ---@param attribute? 'id'|'name'|'side'|'slot'|'ping'|'ipaddr'|'ucid'|'lang'|'started'
         function net.get_player_info(playerID, attribute) end
 
         ---Returns a table of players currently connected to the server.
@@ -156,7 +159,7 @@ do
 
         ---Returns the sideId and slotId of a given player. Is the same as net.get_player_info(playerID, 'side') and net.get_player_info(playerID, 'slot')
         ---https://wiki.hoggitworld.com/view/DCS_func_get_slot
-        ---@return number, number
+        ---@return coalition.side sideId, string slotId
         ---@param playerID Player_id
         function net.get_slot(playerID) end
 
@@ -175,7 +178,7 @@ do
 
         ---Converts a JSON string to a lua value.
         ---https://wiki.hoggitworld.com/view/DCS_func_json2lua
-        ---@return table
+        ---@return any value the decoded Lua value -- a table for a JSON object or array, a scalar otherwise
         ---@param json string
         function net.json2lua(json) end
 

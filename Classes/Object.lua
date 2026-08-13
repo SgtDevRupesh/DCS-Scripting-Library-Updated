@@ -75,9 +75,9 @@ do
         function Object.destroy(self) end
 
         ---Returns a table of what the unit 'can do' varies from unit to unit also can be obtained by getdesc().attributes
-        ---@param self Unit
+        ---@param self Object
         ---@param ... unknown
-        ---@return Attributes
+        ---@return table<Attributes, boolean>
         function Object.getAttributes(self, ...) end
 
         ---Return an enumerator of the category for the specific object. The enumerator returned is dependent on the category of the object. See enumerators Group.Category, Object.Category, and Spot.Category for further reference. Function also works with Unit, Weapon, Static Object, Scenery Object, Airbase. When used with any of these objects the category returned is related to the Object.Category.
@@ -88,6 +88,7 @@ do
 
         ---Returns a string of the name of the object as defined by the mission editor or dynamic spawning functions. Function also works with Unit, Static Object, Airbase When run as Object.getName(obj) the value can be different than if run via Unit.getName(obj) or obj:getName(). It appears to be returning the runtime Id.
         ---https://wiki.hoggitworld.com/view/DCS_func_getName
+        ---@param self Object
         ---@return string
         function Object.getName(self) end
 
@@ -110,7 +111,7 @@ do
 
         ---Returns a vec3 table of the objects velocity vectors. Function also works with Unit, Weapon, Static Object, Scenery Object, Airbase
         ---https://wiki.hoggitworld.com/view/DCS_func_getVelocity
-        ---@return vec3 class
+        ---@return vec3
         function Object.getVelocity(self) end
 
         ---Returns a boolean value if the object in question has the passed attribute. See Article list of Attributes or db_attibutes.lua in C:\Program Files\Eagle Dynamics\DCS World\Scripts\Database for more details. Additionally attributes for each object are defined within their DB lua file. DB files provided on github for reference. Function also works with Unit, Weapon, Static Object, Scenery Object, Airbase.
@@ -119,7 +120,7 @@ do
         ---@param attribute Attributes
         function Object.hasAttribute(self, attribute) end
 
-        ---Returns a vec3 table of the objects velocity vectors. Function also works with Unit, Weapon, Static Object, Scenery Object, Airbase
+        ---Returns a boolean value for whether or not the object is airborne. Function also works with Unit, Weapon, Static Object, Scenery Object, Airbase
         ---https://wiki.hoggitworld.com/view/DCS_func_inAir
         ---@return boolean
         function Object.inAir(self) end

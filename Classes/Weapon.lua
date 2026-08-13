@@ -197,7 +197,7 @@ do
 
         ---Return a description table of the given object. Table entries are dependent on the category of object and the sub-categories that may exist within that object type. Function also works with Unit, Weapon, Static Object, Scenery Object, Airbase.
         ---https://wiki.hoggitworld.com/view/DCS_func_getDesc
-        ---@return desc_weapon class
+        ---@return desc_weapon
         function Weapon.getDesc(self) end
 
         --No Docu
@@ -209,12 +209,12 @@ do
 
         ---Returns the Unit object that had launched the weapon.
         ---https://wiki.hoggitworld.com/view/DCS_func_getLauncher
-        ---@return Unit class
+        ---@return Unit? launcher nil once the launching unit no longer exists
         function Weapon.getLauncher(self) end
 
         ---Returns the target object that the weapon is guiding to.
         ---https://wiki.hoggitworld.com/view/DCS_func_getTarget
-        ---@return Objects class
+        ---@return Objects? target nil for an unguided weapon, or one guiding at a point
         function Weapon.getTarget(self) end
 
         --overloaded Inhereted fuctions from Object class

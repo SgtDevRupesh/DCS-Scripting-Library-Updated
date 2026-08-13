@@ -28,8 +28,13 @@ do
     do
 
     end
-    --The country enumerator contains the constant countryIds and strings for each country present in DCS World. Country ids are indexed starting at 0.
-    --https://wiki.hoggitworld.com/view/DCS_enum_country
+    ---The country enumerator contains the constant countryIds and strings for each
+    ---country present in DCS World. Country ids are indexed starting at 0.
+    ---The ids sit FLAT on this table as well as under country.id, and the reverse
+    ---lookup is country.name. Index 14 does not exist -- DENMARK is 13 and ISRAEL 15.
+    ---maxIndex and next_index are the table's own bookkeeping, not countries.
+    ---https://wiki.hoggitworld.com/view/DCS_enum_country
+    ---@class country
     country = {
         RUSSIA = 0,
         UKRAINE = 1,

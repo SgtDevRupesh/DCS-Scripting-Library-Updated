@@ -330,39 +330,56 @@ do
             ---@class Event_HUMAN_AIRCRAFT_REPAIR_FINISH
             ---@field id 60
 
+            ---The only event whose initiator is a Group handle and not a Unit:
+            ---the option that changed belongs to the flight, not to an airframe.
+            ---@class Event_GROUP_CHANGE_OPTION
+            ---@field id 61           -- The event ID (always 61 for this event)
+            ---@field time number     -- The time at which the event occurred
+            ---@field initiator Group -- The group whose option was changed
+
             ---@class Event_MAX
-            ---@field id 61
+            ---@field id 62
         end
 
 
-        --Missing info 32, 35, 37, 39, 40, 41, 42, 43, 44, 45, 46, 47, 49, 50, 51, 52, 53, 56, 59, 60, 61
+        --Missing info 32, 35, 37, 39, 40, 41, 42, 43, 44, 45, 46, 47, 49, 50, 51, 52, 53, 56, 59, 60
 
         --Mark_panel
         do
             --- Represents a Mark in the game with various properties.
-            --- @class Mark_panel
-            --- @field idx number The index of the mark, unique identifier.
-            --- @field time number The time associated with the mark.
-            --- @field initiator Unit The unit that initiated the mark.
-            --- @field coalition coalition.side The coalition associated with the mark. (-1 for neutral, 1 for RED, 2 for BLUE)
-            --- @field groupID number The group ID associated with the mark. (-1 for none, or a specific group ID)
-            --- @field text string The text associated with the mark.
-            --- @field pos vec3 The position of the mark in 3D space.
+            ---@class Mark_panel
+            ---@field idx number The index of the mark, unique identifier.
+            ---@field time number The time associated with the mark.
+            ---@field initiator Unit The unit that initiated the mark.
+            ---@field coalition coalition.side The coalition associated with the mark. (-1 for neutral, 1 for RED, 2 for BLUE)
+            ---@field groupID number The group ID associated with the mark. (-1 for none, or a specific group ID)
+            ---@field text string The text associated with the mark.
+            ---@field pos vec3 The position of the mark in 3D space.
         end
 
         --VolumeType
         do
-            --- @class world.searchObjects.search_volume.params
-            --- @field point vec3
-            --- @field radius number
+            ---@class world.searchObjects.search_volume.params
+            ---@field point vec3
+            ---@field radius number
 
-            --- @class world.searchObjects.search_volume
-            --- @field id world.VolumeType
-            --- @field params world.searchObjects.search_volume.params
+            ---@class world.searchObjects.search_volume
+            ---@field id world.VolumeType
+            ---@field params world.searchObjects.search_volume.params
         end
 
         ---@class Event_info
         ---@field id world.event Number that represents the event see [world.event]
+
+        --EventHandler
+        do
+            ---What world.addEventHandler takes: a TABLE carrying an onEvent method,
+            ---never a bare function. DCS calls it as handler:onEvent(event), so the
+            ---method receives (self, event).
+            ---Keep the table around -- world.removeEventHandler needs the same one.
+            ---@class EventHandler
+            ---@field onEvent fun(self: EventHandler, event: Event_info)
+        end
     end
 
 
@@ -435,7 +452,8 @@ do
             S_EVENT_SIMULATION_UNFREEZE          = 58,
             S_EVENT_HUMAN_AIRCRAFT_REPAIR_START  = 59,
             S_EVENT_HUMAN_AIRCRAFT_REPAIR_FINISH = 60,
-            S_EVENT_MAX                          = 61,
+            S_EVENT_GROUP_CHANGE_OPTION          = 61,
+            S_EVENT_MAX                          = 62,
         },
         ---@enum world.BirthPlace
         BirthPlace          =
@@ -458,25 +476,26 @@ do
             PYRAMID = 3
         },
 
-        ---@type table<number, function>
+        ---Every handler table currently registered via world.addEventHandler.
+        ---@type table<number, EventHandler>
         eventHandlers       = {},
 
-        ---@type table<number, function>
+        ---Every handler registered via world.setPersistenceHandler, keyed by its name.
+        ---@type table<string, function>
         persistenceHandlers = {}
     }
 
-    ---List of all current event handelars
-    ---get id abtained by using world.addEventHandler(handler)
-    ---@type table<number, any>
-    world.eventHandlers = {}
-
-
     --Functions
     do
-        ---Adds a function as an event handler that executes whenever a simulator event occurs. The most common uses of event handlers are to track statistics of units within a given scenario and to execute code based on certain events occurring. Handlers are passed event tables which contains numerous data regarding the event. For examples of the event tables returned, reference the event page on the wiki to get more information regarding the event.
+        ---Adds an event handler that executes whenever a simulator event occurs. The most common uses of event handlers are to track statistics of units within a given scenario and to execute code based on certain events occurring. Handlers are passed event tables which contains numerous data regarding the event. For examples of the event tables returned, reference the event page on the wiki to get more information regarding the event.
+        ---The handler is a TABLE carrying an onEvent method, not a bare function.
+        ---Hold on to that table: world.removeEventHandler only matches the same one.
         ---https://wiki.hoggitworld.com/view/DCS_func_addEventHandler
-        ---@return function
-        ---@param handler table EventHandler
+        ---@ExampleDesc A handler that logs the id of every event
+        ---@Example local H = {}
+        ---@Example function H:onEvent(event) env.info(tostring(event.id)) end
+        ---@Example world.addEventHandler(H)
+        ---@param handler EventHandler
         function world.addEventHandler( handler ) end
 
         ---Returns a table of airbase objects belonging to the specified coalition. Objects can be ships, static objects(FARP), or airbases on the map. When the function is run as world.getAirbases() no input values required, and the function returns all airbases, ships, and farps on the map.
@@ -490,21 +509,21 @@ do
         ---@return table<number, Mark_panel>
         function world.getMarkPanels() end
 
-        ---Returns a table of the single unit object in the game who's skill level is set as "Player". There is only a single player unit in a mission and in single player the user will always spawn into this unit automatically unless other client or Combined Arms slots are available.
+        ---Returns the single unit object in the game who's skill level is set as "Player". There is only a single player unit in a mission and in single player the user will always spawn into this unit automatically unless other client or Combined Arms slots are available.
+        ---Returns nil on a dedicated server, where no such slot exists.
         ---https://wiki.hoggitworld.com/view/DCS_func_getPlayer
-        ---@return Unit class
+        ---@return Unit?
         function world.getPlayer() end
 
-        ---Adds a function as an event handler that executes whenever a simulator event occurs. The most common uses of event handlers are to track statistics of units within a given scenario and to execute code based on certain events occurring. Handlers are passed event tables which contains numerous data regarding the event. For examples of the event tables returned, reference the event page on the wiki to get more information regarding the event.
+        ---The method DCS calls on a registered handler table, once per simulator event. Declared on world for discoverability -- you write it on your OWN handler table (see EventHandler), you never call world.onEvent yourself.
         ---[Event info](https://wiki.hoggitworld.com/view/Category:Events)
-        ---@param self table
-        ---@param event_info Event_info EventHandler
+        ---@param self EventHandler
+        ---@param event_info Event_info
         function world.onEvent( self, event_info ) end
 
-        ---Removes the specified event handler from handling events. Use this when an event handler has outlived its usefulness.
+        ---Removes the specified event handler from handling events. Use this when an event handler has outlived its usefulness. Must be passed the SAME table that was given to world.addEventHandler.
         ---https://wiki.hoggitworld.com/view/DCS_func_removeEventHandler
-        ---@return function
-        ---@param handler any EventHandler
+        ---@param handler EventHandler
         function world.removeEventHandler( handler ) end
 
         ---Searches the defined area passed to the function to remove craters, object wreckage, and any other debris within the search volume. Will not remove wreckage of scenery objects. See pages for the correct format of each volume type:
@@ -514,13 +533,14 @@ do
         function world.removeJunk( searchVolume ) end
 
         ---Searches a defined volume of 3d space for the specified objects within it and then can run function on each returned object. Object category is either a single enum or a table of enums that defines the types of objects that will be searched for Search volume is the defined 3d space that will be searched. Handler is the function that will be run on each object that is found. Any data is a variable that is passed to the handler function, it can be anything.
+        ---The handler may return false to stop the search early; any other return keeps it going.
         ---https://wiki.hoggitworld.com/view/DCS_func_searchObjects
-        ---@generic ARG
-        ---@return number
+        ---@generic A
+        ---@return number found number of objects the search visited
         ---@param ObjectCategory Object.Category|table<number, Object.Category>
         ---@param searchVolume world.searchObjects.search_volume
-        ---@param Handler fun(Obj:Objects?, ARG:ARG) ObjectSearchHandler
-        ---@param data? ARG
+        ---@param Handler fun(item: Objects, data: A): boolean?
+        ---@param data? A passed straight through to the handler
         function world.searchObjects( ObjectCategory, searchVolume, Handler, data ) end
 
         ---Read persistence data identified by name. Returns Lua-value stored in this miz/sav by a given name or nil if no value found.

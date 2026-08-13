@@ -29,7 +29,6 @@ do
     do
         ---**Runway Class**
         do
-            ---@private
             ---@class Runway
             ---@field course number The course or bearing in radians
             ---@field Name number The identifier for the runway
@@ -41,7 +40,6 @@ do
 
         ---**Airfield parking class table**
         do
-            ---@private
             ---@class Parking_airfield
             ---@field Term_Index number Term_index is the id for the parking
             ---@field vTerminalPos vec3 vTerminal pos is its vec3 position in the world
@@ -54,7 +52,6 @@ do
         ---**Airfield Desc Class**
         do
             ---Represents an entity with life, attributes, and other properties.
-            ---@private
             ---@class desc_Airfield
             ---@field life number The life parameter of the entity
             ---@field attributes EntityAttributes_airfield The attributes of the entity
@@ -105,7 +102,7 @@ do
 
         ---Returns an instance of the calling class for the object of a specified name. The objects name is defined either in the mission editor or within functions that can dynamically spawn objects. All static objects and unit names must be unique. However groups may have the same name as a unit or static object. This function can provide access to non activated units and groups.
         ---https://wiki.hoggitworld.com/view/DCS_func_getByName
-        ---@return self?
+        ---@return Airbase? found nil when nothing in the mission carries that name
         ---@param name string
         function Airbase.getByName(name) end
 
@@ -196,7 +193,7 @@ do
         ---Returns a table with runway information like length, width, course, and Name. position: Returns the center of the runway width: width of the runway in meters Name: runway name, can be off course: bearing in radians. Multiply by -1 to make it useful
         ---https://wiki.hoggitworld.com/view/DCS_func_getRunways
         ---@Example { [1] = { ["course"] = -1.597741484642, ["Name"] = 8, ["position"] = { ["y"] = 952.94458007813, ["x"] = -360507.1875, ["z"] = -75590.0703125, }, ["length"] = 1859.3155517578, ["width"] = 60, }, [2] = { ["course"] = -2.5331676006317, ["Name"] = 26, ["position"] = { ["y"] = 952.94458007813, ["x"] = -359739.875, ["z"] = -75289.5078125, }, ["length"] = 1859.3155517578, ["width"] = 60, }, }
-        ---@return table<number,Runway> class
+        ---@return table<number, Runway>
         function Airbase.getRunways(self) end
 
         ---Return a string of the objects type name. Function also works with Unit, Weapon, Static Object, Scenery Object, Airbase.
@@ -206,7 +203,7 @@ do
 
         ---returns Unit that is corresponded to the airbase. Works only for ships.
         ---https://wiki.hoggitworld.com/view/DCS_func_getUnit
-        ---@return Unit
+        ---@return Unit? unit nil unless the airbase is a ship
         function Airbase.getUnit(self) end
 
         ---Returns the warehouse object associated with the airbase object. Can then be used to call the warehouse class functions to modify the contents of the warehouse.

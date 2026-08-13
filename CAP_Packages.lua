@@ -27,7 +27,6 @@ do
 
     --classes
     do
-        ---@private
         ---@class CAP_packages_class
         ---@field last_idx number Index tracking the last package
         ---@field blue table A table to store the blue packages

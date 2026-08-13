@@ -601,7 +601,9 @@ do
 
         ---recource map
         do
-            ---@private
+            ---A wsType: four numbers indexed 1..4, {mainCategory, subCat1, subCat2, index}.
+            ---NOTE the 4th entry is not stable across DCS patches -- prefer the string
+            ---typeName form wherever a function accepts both.
             ---@class Wherehouse_recource_map
             ---@field [1] number
             ---@field [2] number
@@ -609,6 +611,15 @@ do
             ---@field [4] number
         end
     end
+    ---What Warehouse.getInventory hands back. Aircraft and weapons are keyed by
+    ---their type NAME strings; liquids by the liquidType number. Any category the
+    ---warehouse has set to unlimited comes back as an EMPTY table, not a missing one,
+    ---so an empty aircraft list means "unlimited" just as often as "none left".
+    ---@class Warehouse_inventory
+    ---@field aircrafts table<string, number>
+    ---@field weapon table<string, number>
+    ---@field liquids table<liquidType, number>
+
     ---The warehouse class gives control over warehouses that exist in airbase objects. These warehouses can limit the aircraft, munitions, and fuel available to coalition aircraft.
     ---https://wiki.hoggitworld.com/view/DCS_Class_Warehouse
     ---@class Warehouse
@@ -624,19 +635,19 @@ do
         ---itemName is the typeName associated with the item: "weapons.missiles.AIM_54C_Mk47"
         ---A wsType table can also be used, however the last digit with wsTypes has been known to change. {4, 4, 7, 322}
         ---https://wiki.hoggitworld.com/view/DCS_func_addItem
-        ---@param itemName string|table string or table
+        ---@param itemName wsType|Wherehouse_recource_map the typeName string, or the 4-number wsType table
         ---@param count number
         function Warehouse.addItem( self, itemName, count ) end
 
         ---Adds the passed amount of a liquid fuel into the warehouse inventory
         ---https://wiki.hoggitworld.com/view/DCS_func_addLiquid
         ---@param liquidType liquidType
-        ---@param count number number
+        ---@param count number
         function Warehouse.addLiquid( self, liquidType, count ) end
 
         ---Returns an instance of the calling class for the object of a specified name. The objects name is defined either in the mission editor or within functions that can dynamically spawn objects. All static objects and unit names must be unique. However groups may have the same name as a unit or static object. This function can provide access to non activated units and groups.
         ---https://wiki.hoggitworld.com/view/DCS_func_getByName
-        ---@return self?
+        ---@return Warehouse? found nil when nothing in the mission carries that name
         ---@param name string
         function Warehouse.getByName( name ) end
 
@@ -649,8 +660,8 @@ do
         ---Returns a full itemized list of everything currently in a warehouse. If a category is set to unlimited then the table will be returned empty.
         ---Aircraft and weapons are indexed by strings.
         ---https://wiki.hoggitworld.com/view/DCS_func_getInventory
-        ---@return table
-        ---@param itemName? string|table string or table
+        ---@return Warehouse_inventory inventory a category set to unlimited comes back EMPTY, not absent
+        ---@param itemName? wsType|Wherehouse_recource_map narrows the result to one item
         function Warehouse.getInventory( self, itemName ) end
 
         ---Returns the number of the passed type of item currently in a warehouse object.
@@ -658,7 +669,7 @@ do
         ---A wsType table can also be used, however the last digit with wsTypes has been known to change. {4, 4, 7, 322}
         ---https://wiki.hoggitworld.com/view/DCS_func_getItemCount
         ---@return number
-        ---@param itemName wsType|table<number, number> string or table
+        ---@param itemName wsType|Wherehouse_recource_map the typeName string, or the 4-number wsType table
         function Warehouse.getItemCount( self, itemName ) end
 
         ---Returns the amount of the passed liquid type within a given warehouse.
@@ -669,7 +680,7 @@ do
 
         ---Returns the airbase object associated with the warehouse object
         ---https://wiki.hoggitworld.com/view/DCS_func_getOwner
-        ---@return Airbase class
+        ---@return Airbase
         function Warehouse.getOwner( self ) end
 
         ---Returns the wsType of every object that exists in DCS. A wsType is a table consisting of 4 entries indexed numerically. It can be used to broadly categorize object types. The table can be broken down as: {mainCategory, subCat1, subCat2, index}
@@ -682,28 +693,29 @@ do
         ---itemName is the typeName associated with the item: "weapons.missiles.AIM_54C_Mk47"
         ---A wsType table can also be used, however the last digit with wsTypes has been known to change. {4, 4, 7, 322}
         ---https://wiki.hoggitworld.com/view/DCS_func_removeItemWarehouse
-        ---@param itemName string|table string or table
-        ---@param count number number
+        ---@param itemName wsType|Wherehouse_recource_map the typeName string, or the 4-number wsType table
+        ---@param count number
         function Warehouse.removeItem( self, itemName, count ) end
 
         ---Removes the set amount of liquid from the inventory in a warehouse.
         ---https://wiki.hoggitworld.com/view/DCS_func_removeLiquid
         ---@param liquidType liquidType
-        ---@param count number number
+        ---@param count number
         function Warehouse.removeLiquid( self, liquidType, count ) end
 
         ---Sets the passed amount of a given item to the warehouse.
         ---itemName is the typeName associated with the item: "weapons.missiles.AIM_54C_Mk47"
         ---A wsType table can also be used, however the last digit with wsTypes has been known to change. {4, 4, 7, 322}
         ---https://wiki.hoggitworld.com/view/DCS_func_setItem
-        ---@param itemName string|table string or table
+        ---@param itemName wsType|Wherehouse_recource_map the typeName string, or the 4-number wsType table
         ---@param count number
         function Warehouse.setItem( self, itemName, count ) end
 
-        ---Adds the passed amount of a liquid fuel into the warehouse inventory
-        ---https://wiki.hoggitworld.com/view/DCS_func_addLiquid
+        ---Sets the amount of a liquid fuel in the warehouse inventory to the passed
+        ---value, replacing whatever was there. Use addLiquid to top it up instead.
+        ---https://wiki.hoggitworld.com/view/DCS_func_setLiquidAmount
         ---@param liquidType liquidType
-        ---@param count number number
+        ---@param count number
         function Warehouse.setLiquidAmount( self, liquidType, count ) end
     end
 end

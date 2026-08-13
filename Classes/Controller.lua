@@ -29,13 +29,15 @@ do
     do
         ---**DetectedTarget Controller.getDetectedTargets**
         do
+            ---One row of Controller.getDetectedTargets. `type` and `distance` say
+            ---whether that piece of information is KNOWN to the controller, not what
+            ---it is -- a target can be detected without its type being identified.
             ---Applies only to a Unit Controller. Cannot be used at the group level.
-            ---@private
-            ---@class Controller.getDetectedTargets
-            ---@field object Objects
-            ---@field visible boolean
-            ---@field type boolean
-            ---@field distance boolean
+            ---@class Controller.DetectedTarget
+            ---@field object Objects the detected object
+            ---@field visible boolean currently in line of sight
+            ---@field type boolean the target's type is identified
+            ---@field distance boolean the range to the target is known
         end
     end
 
@@ -46,7 +48,7 @@ do
 
     ---Controller is an object that performs AI-routines. In other words a controller is an instance of the AI. Controller stores the current main task, active enroute tasks, and behavior options. Controllers also can perform commands. Controllers exist at both a group and unit level. However only planes and helicopters can be controlled individually at a unit level. Some functions can only work for Unit Controllers. Different tasks, options, and commands are available for the different group types. (Plane, Helicopter, Ground Unit, and Ship). See the linked articles on these subjects for more information.
     ---https://wiki.hoggitworld.com/view/DCS_Class_Controller
-    ---@enum Conroller.Detection
+    ---@enum Controller.Detection
     Controller.Detection = {
         VISUAL = 1,
         OPTIC = 2,
@@ -63,9 +65,9 @@ do
     do
         ---Returns a table of detected targets that are detected by the different detection methods. If not detection method is specified, then all forms of detection will be used. Applies only to a Unit Controller. Cannot be used at the group level.
         ---https://wiki.hoggitworld.com/view/DCS_func_getDetectedTargets
-        ---@return table<number, Controller.getDetectedTargets>
-        ---@param detectionType1? Conroller.Detection
-        ---@param ...? Conroller.Detection
+        ---@return table<number, Controller.DetectedTarget>
+        ---@param detectionType1? Controller.Detection omit to use every detection method
+        ---@param ... Controller.Detection
         function Controller.getDetectedTargets(self, detectionType1, ...) end
         
 
@@ -76,11 +78,11 @@ do
 
         ---Returns multiple entries that define a number of values if the target is detected by the Unit or group associated with the controller. Values returned are: |boolean detected, -- boolean value if the target is detected| boolean visible, -- boolean value if target is visible by line of sight| ModelTime lastTime, -- the last model time that the target was detected| boolean type, -- if the type of target is known| boolean distance, -- if distance to the target is known| Vec3 lastPos, -- last known position of the target| Vec3 lastVel -- last know velocity vector of the tar|. Function is available at the unit level for all unit types. When used with a Group Controller the function will return expected values only with Ground and Ship groups.
         ---https://wiki.hoggitworld.com/view/DCS_func_isTargetDetected
-        ---@return boolean detected , boolean? visible , number|boolean? lastTime_bool_if_currently_visable  , boolean? type , boolean? distance , vec3? lastPos , vec3? lastVel
+        ---@return boolean detected, boolean visible, number? lastTime, boolean type, boolean distance, vec3? lastPos, vec3? lastVel
         ---@param target Objects
-        ---@param detectionType1? Conroller.Detection
-        ---@param detectionType2? Conroller.Detection  
-        ---@param ... Conroller.Detection 
+        ---@param detectionType1? Controller.Detection
+        ---@param detectionType2? Controller.Detection  
+        ---@param ... Controller.Detection 
         function Controller.isTargetDetected(self, target, detectionType1, detectionType2, ...) end
 
         ---Forces the controller to become aware of the specified target, without the controller manually detecting the object itself. Applies only to a Unit Controller. Cannot be used at the group level.
@@ -126,7 +128,7 @@ do
         ---Options are a pair of identifier and value. Behavior options are global parameters and will affect controller behavior in all tasks it performs. Options are executed immediately. For example Rules of Engagement (ROE) are an option that can dictate whether or not a group is currently allowed to attack. This option can over-ride tasking to attack specific targets. Unlike Tasks and Commands, options are organized by id and value. Reference the following pages for details on each option: ROE, Reaction To Threat, Radar Using, Flare Using, Formation, RTB On Bingo, silence, Disperse on Attack, Alarm State, RTB on Out of Ammo, ECM Using, Prohibit AA, Prohibit Jettison, Prohibit Afterburner, Prohibit AG, Missile Attack Range, Prohibit WP Pass Report, Engage Air Weapons, Option Radio Usage Contact, Option Radio Usage Engage, Option Radio Usage Kill, AC Engagement Range Restriction, jett tanks if empty, forced attack, Altitude Restriction for AAA Min, restrict targets, Altitude Restriction for AAA Max.
         ---https://wiki.hoggitworld.com/view/DCS_func_setOption
         ---@param optionId AI.Option.Air.id|AI.Option.Ground.id|AI.Option.Naval.id
-        ---@param optionValue AI.Option.Air.val|AI.Option.Ground.val|AI.Option.Naval.val
+        ---@param optionValue AI.Option.Air.val|AI.Option.Ground.val|AI.Option.Naval.val|boolean|number
         function Controller.setOption(self, optionId, optionValue) end
 
         ---Sets the controlled group to go the specified speed in meters per second. Optional boolean keep when set to true will maintain that speed on passing waypoints. If no present or false the controlled group will return to the speed as defined by their route.
