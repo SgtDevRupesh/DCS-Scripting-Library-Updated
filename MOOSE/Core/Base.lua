@@ -1,0 +1,569 @@
+---@meta
+
+---Base class of everything
+---@class BASE
+---@field ClassName string The name of the class.
+---@field ClassID number The ID number of the class.
+---@field ClassNameAndID string The name of the class concatenated with the ID number of the class.
+---@field Scheduler SCHEDULER The scheduler object.
+BASE = {
+  ClassName = "BASE",
+  ClassID = 0,
+  Events = {},
+  States = {},
+  Debug = debug,
+  Scheduler = nil,
+  Properties = {},
+}
+
+BASE.__ = {}
+
+BASE._ = {
+  Schedules = {}, --- Contains the Schedulers Active
+}
+
+---BASE constructor.
+---
+---This is an example how to use the BASE:New() constructor in a new class definition when inheriting from BASE.
+---
+---    function EVENT:New()
+---      local self = BASE:Inherit( self, BASE:New() ) -- #EVENT
+---      return self
+---    end
+---@return BASE
+function BASE:New() end
+
+---This is the worker method to inherit from a parent class.
+---@param Child? any
+---@param Parent? BASE is the Parent class that the Child inherits from.
+---@return BASE # Child
+function BASE:Inherit(Child, Parent) end
+
+---This is the worker method to retrieve the Parent class.
+---Note that the Parent class must be passed to call the parent class method.
+---
+---    self:GetParent(self):ParentMethod()
+---@param Child? BASE This is the Child class from which the Parent class needs to be retrieved.
+---@param FromClass? BASE (Optional) The class from which to get the parent.
+---@return BASE
+function BASE:GetParent(Child, FromClass) end
+
+---This is the worker method to check if an object is an (sub)instance of a class.
+---
+---### Examples:
+---
+---   * ZONE:New( 'some zone' ):IsInstanceOf( ZONE ) will return true
+---   * ZONE:New( 'some zone' ):IsInstanceOf( 'ZONE' ) will return true
+---   * ZONE:New( 'some zone' ):IsInstanceOf( 'zone' ) will return true
+---   * ZONE:New( 'some zone' ):IsInstanceOf( 'BASE' ) will return true
+---
+---   * ZONE:New( 'some zone' ):IsInstanceOf( 'GROUP' ) will return false
+---@param ClassName? any
+---@return boolean
+function BASE:IsInstanceOf(ClassName) end
+
+---Get the ClassName + ClassID of the class instance.
+---The ClassName + ClassID is formatted as '%s#%09d'.
+---@return string # The ClassName + ClassID of the class instance.
+function BASE:GetClassNameAndID() end
+
+---Get the ClassName of the class instance.
+---@return string # The ClassName of the class instance.
+function BASE:GetClassName() end
+
+---Get the ClassID of the class instance.
+---@return string # The ClassID of the class instance.
+function BASE:GetClassID() end
+
+---Returns the event dispatcher
+---@return EVENT
+function BASE:EventDispatcher() end
+
+---Get the Class {Core.Event} processing Priority.
+---The Event processing Priority is a number from 1 to 10,
+---reflecting the order of the classes subscribed to the Event to be processed.
+---@return number # The @{Core.Event} processing Priority.
+function BASE:GetEventPriority() end
+
+---Set the Class {Core.Event} processing Priority.
+---The Event processing Priority is a number from 1 to 10,
+---reflecting the order of the classes subscribed to the Event to be processed.
+---@param EventPriority? number The @{Core.Event} processing Priority.
+---@return BASE # self
+function BASE:SetEventPriority(EventPriority) end
+
+---Remove all subscribed events
+---@return BASE
+function BASE:EventRemoveAll() end
+
+---Subscribe to a DCS Event.
+---@param EventID? EVENTS|number|string Event ID.
+---@param EventFunction? function (optional) The function to be called when the event occurs for the unit.
+---@return BASE
+function BASE:HandleEvent(EventID, EventFunction) end
+
+---UnSubscribe to a DCS event.
+---@param EventID? EVENTS|number|string Event ID.
+---@return BASE
+function BASE:UnHandleEvent(EventID) end
+
+---Creation of a Birth Event.
+---@param EventTime? number The time stamp of the event.
+---@param Initiator? Object The initiating object of the event.
+---@param IniUnitName? string The initiating unit name.
+---@param place? any
+---@param subplace? any
+function BASE:CreateEventBirth(EventTime, Initiator, IniUnitName, place, subplace) end
+
+---Creation of a Crash Event.
+---@param EventTime? number The time stamp of the event.
+---@param Initiator? Object The initiating object of the event.
+---@param IniObjectCategory? any
+function BASE:CreateEventCrash(EventTime, Initiator, IniObjectCategory) end
+
+---Creation of a Crash Event.
+---@param EventTime? number The time stamp of the event.
+---@param Initiator? Object The initiating object of the event.
+function BASE:CreateEventUnitLost(EventTime, Initiator) end
+
+---Creation of a Dead Event.
+---@param EventTime? number The time stamp of the event.
+---@param Initiator? Object The initiating object of the event.
+---@param IniObjectCategory? any
+function BASE:CreateEventDead(EventTime, Initiator, IniObjectCategory) end
+
+---Creation of a Remove Unit Event.
+---@param EventTime? number The time stamp of the event.
+---@param Initiator? Object The initiating object of the event.
+function BASE:CreateEventRemoveUnit(EventTime, Initiator) end
+
+---Creation of a Takeoff Event.
+---@param EventTime? number The time stamp of the event.
+---@param Initiator? Object The initiating object of the event.
+function BASE:CreateEventTakeoff(EventTime, Initiator) end
+
+---Creation of a `S_EVENT_PLAYER_ENTER_AIRCRAFT` event.
+---@param PlayerUnit? UNIT The aircraft unit the player entered.
+function BASE:CreateEventPlayerEnterAircraft(PlayerUnit) end
+
+---Creation of a `S_EVENT_GROUP_CHANGE_OPTION` event.
+---@param EventTime? number The time stamp of the event.
+---@param Initiator? Group The initiating group of the event.
+function BASE:CreateEventGroupChangeOption(EventTime, Initiator) end
+
+---Creation of a S_EVENT_NEW_DYNAMIC_CARGO event.
+---@param DynamicCargo? DYNAMICCARGO the dynamic cargo object
+function BASE:CreateEventNewDynamicCargo(DynamicCargo) end
+
+---Creation of a S_EVENT_DYNAMIC_CARGO_LOADED event.
+---@param DynamicCargo? DYNAMICCARGO the dynamic cargo object
+function BASE:CreateEventDynamicCargoLoaded(DynamicCargo) end
+
+---Creation of a S_EVENT_DYNAMIC_CARGO_UNLOADED event.
+---@param DynamicCargo? DYNAMICCARGO the dynamic cargo object
+function BASE:CreateEventDynamicCargoUnloaded(DynamicCargo) end
+
+---Creation of a S_EVENT_DYNAMIC_CARGO_REMOVED event.
+---@param DynamicCargo? DYNAMICCARGO the dynamic cargo object
+function BASE:CreateEventDynamicCargoRemoved(DynamicCargo) end
+
+---The main event handling function... This function captures all events generated for the class.
+---@param event? Event
+function BASE:onEvent(event) end
+
+---Schedule a new time event. Note that the schedule will only take place if the scheduler is *started*. Even for a single schedule event, the scheduler needs to be started also.
+---@param Start? number Specifies the amount of seconds that will be waited before the scheduling is started, and the event function is called.
+---@param SchedulerFunction? function The event function to be called when a timer event occurs. The event function needs to accept the parameters specified in SchedulerArguments.
+---@param ... any
+---@return string # The Schedule ID of the planned schedule.
+function BASE:ScheduleOnce(Start, SchedulerFunction, ...) end
+
+---Schedule a new time event. Note that the schedule will only take place if the scheduler is *started*. Even for a single schedule event, the scheduler needs to be started also.
+---@param Start? number Specifies the amount of seconds that will be waited before the scheduling is started, and the event function is called.
+---@param Repeat? number Specifies the interval in seconds when the scheduler will call the event function.
+---@param RandomizeFactor? number Specifies a randomization factor between 0 and 1 to randomize the Repeat.
+---@param Stop? number Specifies the amount of seconds when the scheduler will be stopped.
+---@param SchedulerFunction? function The event function to be called when a timer event occurs. The event function needs to accept the parameters specified in SchedulerArguments.
+---@param ... any
+---@return string # The Schedule ID of the planned schedule.
+function BASE:ScheduleRepeat(Start, Repeat, RandomizeFactor, Stop, SchedulerFunction, ...) end
+
+---Stops the Schedule.
+---@param SchedulerID? string (Optional) Scheduler ID to be stopped. If nil, all pending schedules are stopped.
+function BASE:ScheduleStop(SchedulerID) end
+
+---Set a state or property of the Object given a Key and a Value.
+---Note that if the Object is destroyed, set to nil, or garbage collected, then the Values and Keys will also be gone.
+---@param Object? any
+---@param Key? any
+---@param Value? any
+---@return The # Value set.
+function BASE:SetState(Object, Key, Value) end
+
+---Get a Value given a Key from the Object.
+---Note that if the Object is destroyed, set to nil, or garbage collected, then the Values and Keys will also be gone.
+---@param Object? any
+---@param Key? any
+---@return The # Value retrieved or nil if the Key was not found and thus the Value could not be retrieved.
+function BASE:GetState(Object, Key) end
+
+---Clear the state of an object.
+---@param Object? any
+---@param StateName? any
+function BASE:ClearState(Object, StateName) end
+
+---Set one property of an object.
+---@param Key? any
+---@param Value? any
+function BASE:SetProperty(Key, Value) end
+
+---Get one property of an object by the key.
+---@param Key? any
+---@return Value # The value that is stored. Note that the value can be a #string, but it can also be any other type! Nil if not found.
+function BASE:GetProperty(Key) end
+
+---Get all of the properties of an object in a table.
+---@return table # of values, indexed by keys.
+function BASE:GetProperties() end
+
+---Set trace on.
+function BASE:TraceOn() end
+
+---Set trace off.
+function BASE:TraceOff() end
+
+---Set trace on or off
+---Note that when trace is off, no BASE.Debug statement is performed, increasing performance!
+---When Moose is loaded statically, (as one file), tracing is switched off by default.
+---So tracing must be switched on manually in your mission if you are using Moose statically.
+---When moose is loading dynamically (for moose class development), tracing is switched on by default.
+---@param TraceOnOff? boolean Switch the tracing on or off.
+function BASE:TraceOnOff(TraceOnOff) end
+
+---Enquires if tracing is on (for the class).
+---@return boolean
+function BASE:IsTrace() end
+
+---Set trace level
+---@param Level? number
+function BASE:TraceLevel(Level) end
+
+---Trace all methods in MOOSE
+---@param TraceAll? boolean true = trace all methods in MOOSE.
+function BASE:TraceAll(TraceAll) end
+
+---Set tracing for a class
+---@param Class? string Class name.
+function BASE:TraceClass(Class) end
+
+---Set tracing for a specific method of  class
+---@param Class? string Class name.
+---@param Method? string Method.
+function BASE:TraceClassMethod(Class, Method) end
+
+---(Internal) Serialize arguments
+---@param Arguments? table
+---@return string # Text
+function BASE:_Serialize(Arguments) end
+
+---Trace a function call. This function is private.
+---@param Arguments? any
+---@param DebugInfoCurrentParam? any
+---@param DebugInfoFromParam? any
+function BASE:_F(Arguments, DebugInfoCurrentParam, DebugInfoFromParam) end
+
+---Trace a function call. Must be at the beginning of the function logic.
+---@param Arguments? any
+function BASE:F(Arguments) end
+
+---Trace a function call level 2. Must be at the beginning of the function logic.
+---@param Arguments? any
+function BASE:F2(Arguments) end
+
+---Trace a function call level 3. Must be at the beginning of the function logic.
+---@param Arguments? any
+function BASE:F3(Arguments) end
+
+---Trace a function logic.
+---@param Arguments? any
+---@param DebugInfoCurrentParam? any
+---@param DebugInfoFromParam? any
+function BASE:_T(Arguments, DebugInfoCurrentParam, DebugInfoFromParam) end
+
+---Trace a function logic level 1. Can be anywhere within the function logic.
+---@param Arguments? any
+function BASE:T(Arguments) end
+
+---Trace a function logic level 2. Can be anywhere within the function logic.
+---@param Arguments? any
+function BASE:T2(Arguments) end
+
+---Trace a function logic level 3. Can be anywhere within the function logic.
+---@param Arguments? any
+function BASE:T3(Arguments) end
+
+---Log an exception which will be traced always. Can be anywhere within the function logic.
+---@param Arguments? any
+function BASE:E(Arguments) end
+
+---Log an information which will be traced always. Can be anywhere within the function logic.
+---@param Arguments? any
+function BASE:I(Arguments) end
+
+---Occurs whenever any unit in a mission fires a weapon. But not any machine gun or autocannon based weapon, those are handled by EVENT.ShootingStart.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventShot(EventData) end
+
+---Occurs whenever an object is hit by a weapon.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---initiator : The unit object the fired the weapon
+---weapon: Weapon object that hit the target
+---target: The Object that was hit.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventHit(EventData) end
+
+---Occurs when an aircraft takes off from an airbase, farp, or ship.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---initiator : The unit that tookoff
+---place: Object from where the AI took-off from. Can be an Airbase Object, FARP, or Ships
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventTakeoff(EventData) end
+
+---Occurs when an aircraft lands at an airbase, farp or ship
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---initiator : The unit that has landed
+---place: Object that the unit landed on. Can be an Airbase Object, FARP, or Ships
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventLand(EventData) end
+
+---Occurs when any aircraft crashes into the ground and is completely destroyed.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---initiator : The unit that has crashed
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventCrash(EventData) end
+
+---Occurs when a pilot ejects from an aircraft
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---initiator : The unit that has ejected
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventEjection(EventData) end
+
+---Occurs when an aircraft connects with a tanker and begins taking on fuel.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---initiator : The unit that is receiving fuel.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventRefueling(EventData) end
+
+---Occurs when an object is dead.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---initiator : The unit that is dead.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventDead(EventData) end
+
+---Occurs when an Event for an object is triggered.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---initiator : The unit that triggered the event.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEvent(EventData) end
+
+---Occurs when the pilot of an aircraft is killed. Can occur either if the player is alive and crashes or if a weapon kills the pilot without completely destroying the plane.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---initiator : The unit that the pilot has died in.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventPilotDead(EventData) end
+
+---Occurs when a ground unit captures either an airbase or a farp.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---initiator : The unit that captured the base
+---place: The airbase that was captured, can be a FARP or Airbase. When calling place:getCoalition() the faction will already be the new owning faction.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventBaseCaptured(EventData) end
+
+---Occurs when a mission starts
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventMissionStart(EventData) end
+
+---Occurs when a mission ends
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventMissionEnd(EventData) end
+
+---Occurs when an aircraft is finished taking fuel.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---initiator : The unit that was receiving fuel.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventRefuelingStop(EventData) end
+
+---Occurs when any object is spawned into the mission.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---initiator : The unit that was spawned
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventBirth(EventData) end
+
+---Occurs when any system fails on a human controlled aircraft.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---initiator : The unit that had the failure
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventHumanFailure(EventData) end
+
+---Occurs when any aircraft starts its engines.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---initiator : The unit that is starting its engines.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventEngineStartup(EventData) end
+
+---Occurs when any aircraft shuts down its engines.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---initiator : The unit that is stopping its engines.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventEngineShutdown(EventData) end
+
+---Occurs when any player assumes direct control of a unit. Note - not Mulitplayer safe. Use PlayerEnterAircraft.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---initiator : The unit that is being taken control of.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventPlayerEnterUnit(EventData) end
+
+---Occurs when any player relieves control of a unit to the AI.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---initiator : The unit that the player left.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventPlayerLeaveUnit(EventData) end
+
+---Occurs when any unit begins firing a weapon that has a high rate of fire. Most common with aircraft cannons (GAU-8), autocannons, and machine guns.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---initiator : The unit that is doing the shooting.
+---target: The unit that is being targeted.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventShootingStart(EventData) end
+
+---Occurs when any unit stops firing its weapon. Event will always correspond with a shooting start event.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---initiator : The unit that was doing the shooting.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventShootingEnd(EventData) end
+
+---Occurs when a new mark was added.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---MarkID: ID of the mark.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventMarkAdded(EventData) end
+
+---Occurs when a mark was removed.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---MarkID: ID of the mark.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventMarkRemoved(EventData) end
+
+---Occurs when a mark text was changed.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---MarkID: ID of the mark.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventMarkChange(EventData) end
+
+---Unknown precisely what creates this event, likely tied into newer damage model. Will update this page when new information become available.
+---
+---* initiator: The unit that had the failure.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventDetailedFailure(EventData) end
+
+---Occurs when any modification to the "Score" as seen on the debrief menu would occur.
+---There is no information on what values the score was changed to. Event is likely similar to player_comment in this regard.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventScore(EventData) end
+
+---Occurs on the death of a unit. Contains more and different information. Similar to unit_lost it will occur for aircraft before the aircraft crash event occurs.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---
+---* initiator: The unit that killed the target
+---* target: Target Object
+---* weapon: Weapon Object
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventKill(EventData) end
+
+---Occurs when any modification to the "Score" as seen on the debrief menu would occur.
+---There is no information on what values the score was changed to. Event is likely similar to player_comment in this regard.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventScore(EventData) end
+
+---Occurs when the game thinks an object is destroyed.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---
+---* initiator: The unit that is was destroyed.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventUnitLost(EventData) end
+
+---Occurs shortly after the landing animation of an ejected pilot touching the ground and standing up. Event does not occur if the pilot lands in the water and sub combs to Davey Jones Locker.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---
+---* initiator: Static object representing the ejected pilot. Place : Aircraft that the pilot ejected from.
+---* place: may not return as a valid object if the aircraft has crashed into the ground and no longer exists.
+---* subplace: is always 0 for unknown reasons.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventLandingAfterEjection(EventData) end
+
+---Paratrooper landing.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventParatrooperLanding(EventData) end
+
+---Discard chair after ejection.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventDiscardChairAfterEjection(EventData) end
+
+---Weapon add. Fires when entering a mission per pylon with the name of the weapon (double pylons not counted, infinite wep reload not counted.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventParatrooperLanding(EventData) end
+
+---Trigger zone.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventTriggerZone(EventData) end
+
+---Landing quality mark.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventLandingQualityMark(EventData) end
+
+---BDA.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventBDA(EventData) end
+
+---Occurs when a player enters a slot and takes control of an aircraft.
+---Have a look at the class {Core.Event#EVENT} as these are just the prototypes.
+---**NOTE**: This is a workaround of a long standing DCS bug with the PLAYER_ENTER_UNIT event.
+---initiator : The unit that is being taken control of.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventPlayerEnterAircraft(EventData) end
+
+---Occurs when an option is changed for an AI group.
+---The event identifies the initiating group, but does not provide the option ID or value.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventGroupChangeOption(EventData) end
+
+---Occurs when a player creates a dynamic cargo object from the F8 ground crew menu.
+---*** NOTE *** this is a workarounf for DCS not creating these events as of Aug 2024.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventNewDynamicCargo(EventData) end
+
+---Occurs when a player loads a dynamic cargo object with the F8 ground crew menu into a helo.
+---*** NOTE *** this is a workarounf for DCS not creating these events as of Aug 2024.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventDynamicCargoLoaded(EventData) end
+
+---Occurs when a player unloads a dynamic cargo object with the F8 ground crew menu from a helo.
+---*** NOTE *** this is a workarounf for DCS not creating these events as of Aug 2024.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventDynamicCargoUnloaded(EventData) end
+
+---Occurs when a dynamic cargo crate is removed.
+---*** NOTE *** this is a workarounf for DCS not creating these events as of Aug 2024.
+---@param EventData? EVENTDATA The EventData structure.
+function BASE:OnEventDynamicCargoRemoved(EventData) end
